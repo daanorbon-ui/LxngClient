@@ -1,118 +1,79 @@
-/*
- * Copyright (c) 2022 DupliCAT
- * GNU Lesser General Public License v3.0
- */
+package net.lxngclient.gui;
 
-package dev.cloudmc.gui.titlescreen;
-
-import dev.cloudmc.Cloud;
-import dev.cloudmc.gui.titlescreen.buttons.IconButton;
-import dev.cloudmc.gui.titlescreen.buttons.TextButton;
-import dev.cloudmc.helpers.font.GlyphPageFontRenderer;
-import dev.cloudmc.helpers.render.Helper2D;
-import net.minecraft.client.gui.GuiMultiplayer;
-import net.minecraft.client.gui.GuiOptions;
-import net.minecraft.client.gui.GuiSelectWorld;
-
+import net.lxngclient.util.ColorUtils;
+import net.minecraft.client.gui.*;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.ResourceLocation;
 import java.io.IOException;
-import java.util.ArrayList;
 
-public class TitleScreen extends Panorama {
+public class LxngMainMenu extends GuiScreen {
 
-    private final ArrayList<TextButton> textButtons = new ArrayList<>();
-    private final ArrayList<IconButton> iconButtons = new ArrayList<>();
+    // De "Electric Midnight" achtergrondkleur
+    private final int backgroundColor = 0xFF0F0F12;
 
-    public TitleScreen() {
-        textButtons.add(new TextButton("Singleplayer", width / 2 - 75, height / 2));
-        textButtons.add(new TextButton("Multiplayer", width / 2 - 75, height / 2 + 25));
-        textButtons.add(new TextButton("Settings", width / 2 - 75, height / 2 + 50));
-        iconButtons.add(new IconButton("cross.png", width - 25, 5));
+    @Override
+    public void initGui() {
+        int x = this.width / 2;
+        int y = this.height / 2;
+
+        // Knoppen toevoegen met de Lxng-stijl
+        this.buttonList.add(new GuiButton(1, x - 100, y, 200, 20, "SINGLEPLAYER"));
+        this.buttonList.add(new GuiButton(2, x - 100, y + 24, 200, 20, "MULTIPLAYER"));
+        this.buttonList.add(new GuiButton(3, x - 100, y + 48, 200, 20, "LXNG SETTINGS"));
+        this.buttonList.add(new GuiButton(0, x - 100, y + 72, 200, 20, "QUIT GAME"));
+        
+        super.initGui();
     }
-
-    /**
-     * Renders button text and logos on the screen
-     *
-     * @param mouseX       The current X position of the mouse
-     * @param mouseY       The current Y position of the mouse
-     * @param partialTicks The partial ticks used for rendering
-     */
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        // 1. Teken de Midnight achtergrond
+        drawRect(0, 0, this.width, this.height, backgroundColor);
+
+        // 2. Ling Glow Titel berekenen
+        // We laten de kleuren vloeiend in elkaar overgaan voor de tekst
+        String title = "LXNGCLIENT";
+        float scale = 4.0f;
+        
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(this.width / 2f, this.height / 4f, 0);
+        GlStateManager.scale(scale, scale, scale);
+
+        // Teken de titel letter voor letter voor een "Wave" effect in de gradient
+        float xOffset = - (this.fontRendererObj.getStringWidth(title) / 2f);
+        for (int i = 0; i < title.length(); i++) {
+            char c = title.charAt(i);
+            // Index 'i * 100' zorgt dat de letters een andere fase van de gradient hebben
+            int color = ColorUtils.getLingGlow(i * 100);
+            this.fontRendererObj.drawStringWithShadow(String.valueOf(c), xOffset, 0, color);
+            xOffset += this.fontRendererObj.getCharWidth(c);
+        }
+        
+        GlStateManager.popMatrix();
+
+        // 3. Subtiele versie-informatie (Ling Edition)
+        String footer = "LxngClient v1.0 | Developed for Ling";
+        this.fontRendererObj.drawStringWithShadow(footer, 2, this.height - 10, 0x80FFFFFF);
+
+        // 4. Teken de knoppen
         super.drawScreen(mouseX, mouseY, partialTicks);
-
-        int y = 0;
-        for (TextButton textButton : textButtons) {
-            textButton.renderButton(width / 2 - 75, height / 2 + y * 25, mouseX, mouseY);
-            y++;
-        }
-
-        for (IconButton iconButton : iconButtons) {
-            if (iconButton.getIcon().equals("cross.png")) {
-                iconButton.renderButton(width - 25, 5, mouseX, mouseY);
-            }
-        }
-
-        drawLogo();
-        drawCopyright();
     }
-
-    /**
-     * Is called when any mouse button is pressed. Adds functionality to every button on screen
-     *
-     * @param mouseX      The current X position of the mouse
-     * @param mouseY      The current Y position of the mouse
-     * @param mouseButton The current mouse button which is pressed
-     */
 
     @Override
-    public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        for (TextButton textButton : textButtons) {
-            if (textButton.isHovered(mouseX, mouseY)) {
-                switch (textButton.getText()) {
-                    case "Singleplayer":
-                        mc.displayGuiScreen(new GuiSelectWorld(this));
-                        break;
-                    case "Multiplayer":
-                        mc.displayGuiScreen(new GuiMultiplayer(this));
-                        break;
-                    case "Settings":
-                        mc.displayGuiScreen(new GuiOptions(this, mc.gameSettings));
-                        break;
-                }
-            }
+    protected void actionPerformed(GuiButton button) throws IOException {
+        switch (button.id) {
+            case 1:
+                this.mc.displayGuiScreen(new GuiSelectWorld(this));
+                break;
+            case 2:
+                this.mc.displayGuiScreen(new GuiMultiplayer(this));
+                break;
+            case 3:
+                // Hier komt later je custom Lxng Settings menu
+                break;
+            case 0:
+                this.mc.shutdown();
+                break;
         }
-
-        for (IconButton iconButton : iconButtons) {
-            if (iconButton.isHovered(mouseX, mouseY)) {
-                if (iconButton.getIcon().equals("cross.png")) {
-                    mc.shutdown();
-                }
-            }
-        }
-
-        super.mouseClicked(mouseX, mouseY, mouseButton);
-    }
-
-    /**
-     * Draws the main "Cloud" Text and the Logo in the middle
-     */
-
-    private void drawLogo() {
-        GlyphPageFontRenderer fontRenderer = Cloud.INSTANCE.fontHelper.size40;
-        fontRenderer.drawString(Cloud.modName, width / 2f - fontRenderer.getStringWidth(Cloud.modName) / 2f, height / 2f - 27.5f, -1);
-        Helper2D.drawPicture(width / 2 - 30, height / 2 - 78, 60, 60, 0x40ffffff, "cloudlogo.png");
-    }
-
-    /**
-     * Draws the "Cloud Client" Text and Mojang Copyright Notice on the bottom
-     */
-
-    private void drawCopyright() {
-        GlyphPageFontRenderer fontRenderer = Cloud.INSTANCE.fontHelper.size20;
-        String copyright = "Copyright Mojang Studios. Do not distribute!";
-        String text = Cloud.modName + " Client " + Cloud.modVersion;
-        fontRenderer.drawString(copyright, width - fontRenderer.getStringWidth(copyright) - 2, height - fontRenderer.getFontHeight(), 0x50ffffff);
-        fontRenderer.drawString(text, 4, height - fontRenderer.getFontHeight(), 0x50ffffff);
     }
 }
