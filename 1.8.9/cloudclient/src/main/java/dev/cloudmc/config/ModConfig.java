@@ -1,14 +1,17 @@
 /*
- * Copyright (c) 2022 DupliCAT
+ * Copyright (c) 2026 LxngClient (Ling Edition)
  * GNU Lesser General Public License v3.0
  */
 
-package dev.cloudmc.config;
+package net.lxngclient.config;
 
-import dev.cloudmc.feature.setting.Setting;
-
+import net.lxngclient.feature.setting.Setting;
 import java.util.ArrayList;
 
+/**
+ * LxngClient ModConfig
+ * Beheert de opgeslagen status, positie en instellingen van elke module.
+ */
 public class ModConfig {
 
     private String name;
@@ -17,7 +20,7 @@ public class ModConfig {
     private int[] positions;
     private float size;
 
-    public ModConfig(String name, boolean toggled, ArrayList<Setting> settings, int[] positions, float size){
+    public ModConfig(String name, boolean toggled, ArrayList<Setting> settings, int[] positions, float size) {
         this.name = name;
         this.toggled = toggled;
         this.settings = settings;
@@ -25,6 +28,9 @@ public class ModConfig {
         this.size = size;
     }
 
+    /**
+     * Haalt de naam van de module op (bijv. "FPS" of "ToggleSprint")
+     */
     public String getName() {
         return name;
     }
@@ -33,6 +39,9 @@ public class ModConfig {
         this.name = name;
     }
 
+    /**
+     * Controleert of de module aanstaat in de LxngClient
+     */
     public boolean isToggled() {
         return toggled;
     }
@@ -41,6 +50,9 @@ public class ModConfig {
         this.toggled = toggled;
     }
 
+    /**
+     * Haalt de specifieke instellingen (zoals kleuren of bereik) op
+     */
     public ArrayList<Setting> getSettings() {
         return settings;
     }
@@ -49,6 +61,9 @@ public class ModConfig {
         this.settings = settings;
     }
 
+    /**
+     * Geeft de X en Y coördinaten terug voor de Pixel-Snap GUI
+     */
     public int[] getPositions() {
         return positions;
     }
@@ -57,6 +72,9 @@ public class ModConfig {
         this.positions = positions;
     }
 
+    /**
+     * De schaal van de module op de HUD
+     */
     public float getSize() {
         return size;
     }
