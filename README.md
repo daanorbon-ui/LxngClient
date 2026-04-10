@@ -71,7 +71,7 @@ Conditions:
 - License and copyright notice
 - State changes 
 - Disclose source
-- Same license 
+- Same license   
 
 This project uses code from:
 - superblaubeere27 (Font Renderer) https://github.com/superblaubeere27
